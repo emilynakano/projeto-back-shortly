@@ -27,22 +27,26 @@ export async function signUp(req, res) {
 }
 export async function signIn(req, res) {
     const {email, password} = req.body;
-
-    const {rows: users, rowCount} = await connection.query(`
-    SELECT * FROM users WHERE email=$1`,
-    [email]);
-
-    const user = users[0];
-
-    if(rowCount > 0 && bcrypt.compareSync(password, user.password)) {
-        const token = uuid();
-        
-        await connection.query(`
-        INSERT INTO sessions ("userId", token) VALUES ($1, $2)`, [user.id, token]);
-
-        return res.status(200).send(token)
-    } else {
-        return res.status(401)
+    try {
+        const {rows: users, rowCount} = await connection.query(`
+        SELECT * FROM users WHERE email=$1`,
+        [email]);
+    
+        const user = users[0];
+    
+        if(rowCount > 0 && bcrypt.compareSync(password, user.password)) {
+            const token = uuid();
+    
+            await connection.query(`
+            INSERT INTO sessions ("userId", token) VALUES ($1, $2)`, [user.id, token]);
+    
+            return res.status(200).send(token)
+        } else {
+            return res.sendStatus(401)
+        }
+    } catch {
+        res.sendStatus(500)
     }
+
 }
 
