@@ -35,3 +35,19 @@ export async function getUrlById(req, res) {
     }
 
 }
+
+export async function openUrl(req, res) {
+    const {rows:urls, rowCount} = await connection.query(`
+    SELECT * FROM "shortenedUrls" WHERE "shortUrl"=$1`,
+    [req.params.shortUrl]);
+
+    if(rowCount === 0) {
+        return res.sendStatus(404)
+    }
+
+    await connection.query(`
+    UPDATE "shortenedUrls" SET "visitCount"=$1 WHERE "shortUrl"=$2`,
+    [urls[0].visitCount + 1,req.params.shortUrl])
+    
+    res.redirect(urls[0].url)
+}
