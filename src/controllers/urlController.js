@@ -37,17 +37,53 @@ export async function getUrlById(req, res) {
 }
 
 export async function openUrl(req, res) {
-    const {rows:urls, rowCount} = await connection.query(`
-    SELECT * FROM "shortenedUrls" WHERE "shortUrl"=$1`,
-    [req.params.shortUrl]);
+    try {
+        const {rows:urls, rowCount} = await connection.query(`
+        SELECT * FROM "shortenedUrls" WHERE "shortUrl"=$1`,
+        [req.params.shortUrl]);
+    
+        if(rowCount === 0) {
+            return res.sendStatus(404)
+        }
+    
+        await connection.query(`
+        UPDATE "shortenedUrls" SET "visitCount"=$1 WHERE "shortUrl"=$2`,
+        [urls[0].visitCount + 1,req.params.shortUrl])
 
-    if(rowCount === 0) {
-        return res.sendStatus(404)
+        res.redirect(urls[0].url)
+    } catch {
+        res.sendStatus(500)
     }
 
-    await connection.query(`
-    UPDATE "shortenedUrls" SET "visitCount"=$1 WHERE "shortUrl"=$2`,
-    [urls[0].visitCount + 1,req.params.shortUrl])
+}
+
+export async function deleteUrl(req, res) {
+    const {user} = res.locals;
+    const {id} = req.params;
+
+    try {
+        const url = await connection.query(`
+        SELECT * FROM "shortenedUrls" WHERE id=$1`,
+        [id]);
     
-    res.redirect(urls[0].url)
+        if(url.rowCount === 0) {
+            return res.sendStatus(404)
+        }
+    
+        const urlUser = await connection.query(`
+        SELECT * FROM "shortenedUrls" WHERE "userId"=$1 AND id=$2`,
+        [user.id, id]);
+    
+        if(urlUser.rowCount === 0) {
+            return res.sendStatus(401)
+        }
+    
+        await connection.query(`
+        DELETE FROM "shortenedUrls" WHERE "userId"=$1 AND id=$2`,
+        [user.id, id]);
+    
+        res.sendStatus(204)
+    } catch {
+        res.sendStatus(500)
+    }
 }
