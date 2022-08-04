@@ -10,7 +10,7 @@ export async function createShortUrl(req, res) {
     try {
         await connection.query(`
         INSERT INTO "shortenedUrls" ("userId", "shortUrl", "url") VALUES ($1, $2, $3)`,
-        [user[0].id, shortUri, url])
+        [user.id, shortUri, url])
     
         res.send({"shortUri": shortUri}).status(201)
     } catch {
@@ -83,6 +83,29 @@ export async function deleteUrl(req, res) {
         [user.id, id]);
     
         res.sendStatus(204)
+    } catch {
+        res.sendStatus(500)
+    }
+}
+
+export async function getUser (req, res) {
+    const {user} = res.locals;
+
+    try {
+        const {rows: urls} = await connection.query(`
+        SELECT id, "shortUrl", url, "visitCount" FROM "shortenedUrls" WHERE "userId"=$1
+        `, [user.id]);
+    
+        let sum = 0;
+        urls.map(url => sum += url.visitCount)
+    
+        const urlsUser = {
+            "id": user.id,
+            "name": user.name,
+            "visitCount": sum,
+            "shortenedUrls":urls
+        }
+        res.send(urlsUser).status(200);
     } catch {
         res.sendStatus(500)
     }

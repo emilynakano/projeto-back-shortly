@@ -14,7 +14,7 @@ export default async function tokenMiddleware (req, res, next) {
     WHERE token=$1`, [token]);
 
     if(rowCount === 0) {
-        return res.sendStatus(401)
+        return res.sendStatus(404)
     }
     res.locals.user = user[0]
     next()
