@@ -8,13 +8,14 @@ export default async function tokenMiddleware (req, res, next) {
         return res.sendStatus(401)
     }
     
-    const {rowCount} = await connection.query(`
-    SELECT * FROM sessions 
+    const {rowCount, rows} = await connection.query(`
+    SELECT users.* FROM sessions 
     JOIN users ON sessions."userId"=users.id 
     WHERE token=$1`, [token]);
 
     if(rowCount === 0) {
         return res.sendStatus(401)
     }
+    res.locals.user = rows
     next()
 }
