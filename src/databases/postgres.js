@@ -5,13 +5,12 @@ dotenv.config()
 
 const {Pool} = pkg;
 
-const databaseConfig = {
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
-}
-
-const connection = new Pool(databaseConfig);
+const connection = new Pool({
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: 'postgres1',
+    database: 'shortly'
+});
 
 export default connection
