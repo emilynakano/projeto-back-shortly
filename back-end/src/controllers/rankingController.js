@@ -1,3 +1,4 @@
+import connection from "../db/postgres.js";
 export async function ranking(req, res) {
     try {
         const {rows:users} = await connection.query(`
