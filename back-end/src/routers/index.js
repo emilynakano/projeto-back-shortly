@@ -9,6 +9,6 @@ const router = Router();
 router.use(authRouter);
 router.use(urlRouter);
 router.use(rankingRouter);
-router.use(userRouter)
+router.use(userRouter);
 
 export default router;
