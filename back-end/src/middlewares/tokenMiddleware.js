@@ -1,4 +1,4 @@
-import connection from "../databases/postgres.js";
+import connection from "../db/postgres.js";
 
 export default async function tokenMiddleware (req, res, next) {
     const {authorization} = req.headers;

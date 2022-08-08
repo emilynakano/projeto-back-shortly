@@ -1,4 +1,4 @@
-import connection from "../databases/postgres.js";
+import connection from "../db/postgres.js";
 import bcrypt from 'bcrypt'
 import {v4 as uuid} from 'uuid'
 
