@@ -1,0 +1,6 @@
+[submodule "frontt"]
+	path = frontt
+	url = https://github.com/emilynakano/projeto-front-shortly.git
+[submodule "front-end"]
+	path = front-end
+	url = https://github.com/emilynakano/projeto-front-shortly.git
